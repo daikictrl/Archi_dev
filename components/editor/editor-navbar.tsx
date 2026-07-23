@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { UserButton } from "@clerk/nextjs"
-import { PanelLeftClose, PanelLeftOpen, Share2, Sparkles, Home, LayoutTemplate } from "lucide-react"
+import { PanelLeftClose, PanelLeftOpen, Share2, Sparkles, Home, LayoutTemplate, Sun, Moon } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useProjects } from "@/lib/project-context"
 import { ShareDialog } from "./share-dialog"
+import { useTheme } from "@/components/theme-provider"
 
 type EditorNavbarProps = {
   isSidebarOpen: boolean
@@ -28,6 +29,7 @@ function EditorNavbar({
   const roomId = params?.roomId as string | undefined
   const { projects, isAiSidebarOpen, toggleAiSidebar, setTemplatesModalOpen, canvasSaveStatus } = useProjects()
   const [isShareOpen, setIsShareOpen] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   const currentProject = roomId ? projects.find((p) => p.id === roomId) : null
 
@@ -79,6 +81,21 @@ function EditorNavbar({
         <div className="hidden min-w-0 flex-1 items-center justify-center sm:flex" />
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Toggle color theme"
+            onClick={toggleTheme}
+            className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4.5 w-4.5" />
+            ) : (
+              <Moon className="h-4.5 w-4.5" />
+            )}
+          </Button>
+
           {currentProject && (
             <>
               <Button

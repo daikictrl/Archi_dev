@@ -1,7 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/ui/themes";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,7 +23,6 @@ export const metadata: Metadata = {
 };
 
 const clerkAppearance = {
-  theme: dark,
   variables: {
     colorPrimary: "var(--primary)",
     colorPrimaryForeground: "var(--primary-foreground)",
@@ -51,22 +50,41 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('theme') || 'dark';
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full">
-        <ClerkProvider
-          appearance={clerkAppearance}
-          signInUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in"}
-          signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? "/sign-up"}
-          afterSignOutUrl={
-            process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in"
-          }
-          afterMultiSessionSingleSignOutUrl={
-            process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in"
-          }
-        >
-          {children}
-        </ClerkProvider>
+        <ThemeProvider>
+          <ClerkProvider
+            appearance={clerkAppearance}
+            signInUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in"}
+            signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? "/sign-up"}
+            afterSignOutUrl={
+              process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in"
+            }
+            afterMultiSessionSingleSignOutUrl={
+              process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in"
+            }
+          >
+            {children}
+          </ClerkProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

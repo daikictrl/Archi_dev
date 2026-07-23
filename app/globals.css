@@ -71,6 +71,61 @@
 }
 
 :root {
+    color-scheme: light;
+    --bg-base: #f8f9fa;
+    --bg-surface: #ffffff;
+    --bg-elevated: #f1f3f5;
+    --bg-subtle: #e9ecef;
+    --border-default: #dee2e6;
+    --border-subtle: #ced4da;
+    --text-primary: #1a1a1e;
+    --text-secondary: #495057;
+    --text-muted: #6c757d;
+    --text-faint: #adb5bd;
+    --accent-primary: #008f9a;
+    --accent-primary-dim: rgba(0, 143, 154, 0.1);
+    --accent-ai: #4f46e5;
+    --accent-ai-text: #6366f1;
+    --state-error: #dc3545;
+    --state-success: #198754;
+    --state-warning: #f5a623;
+    --selection-outline: #1a1a1e;
+
+    --background: oklch(0.99 0.005 240);
+    --foreground: oklch(0.15 0.01 240);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.15 0.01 240);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.15 0.01 240);
+    --primary: oklch(0.2 0.01 240);
+    --primary-foreground: oklch(0.99 0.005 240);
+    --secondary: oklch(0.95 0.005 240);
+    --secondary-foreground: oklch(0.2 0.01 240);
+    --muted: oklch(0.95 0.005 240);
+    --muted-foreground: oklch(0.5 0.01 240);
+    --accent: oklch(0.95 0.005 240);
+    --accent-foreground: oklch(0.2 0.01 240);
+    --destructive: oklch(0.6 0.18 25);
+    --border: oklch(0.9 0.01 240);
+    --input: oklch(0.9 0.01 240);
+    --ring: oklch(0.5 0.1 240);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.98 0.005 240);
+    --sidebar-foreground: oklch(0.15 0.01 240);
+    --sidebar-primary: oklch(0.2 0.01 240);
+    --sidebar-primary-foreground: oklch(0.99 0.005 240);
+    --sidebar-accent: oklch(0.95 0.005 240);
+    --sidebar-accent-foreground: oklch(0.2 0.01 240);
+    --sidebar-border: oklch(0.9 0.01 240);
+    --sidebar-ring: oklch(0.5 0.1 240);
+}
+
+.dark {
     color-scheme: dark;
     --bg-base: #080809;
     --bg-surface: #111114;
@@ -89,42 +144,8 @@
     --state-error: #ff4d4f;
     --state-success: #34d399;
     --state-warning: #fbbf24;
+    --selection-outline: #ffffff;
 
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-}
-
-.dark {
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
@@ -168,4 +189,38 @@
   html {
     @apply font-sans;
     }
+}
+
+/* LIGHT MODE ONLY: Custom light-grey hand SVG cursor for scrolling/panning blank canvas */
+html:not(.dark) .react-flow__pane {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%238a8a93' stroke='%231a1a1e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0'/%3E%3Cpath d='M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6'/%3E%3Cpath d='M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8'/%3E%3Cpath d='M18 8a2 2 0 0 1 2 2v4a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6v-1.5'/%3E%3C/svg%3E") 12 12, grab !important;
+}
+
+html:not(.dark) .react-flow__pane:active,
+html:not(.dark) .react-flow__pane.dragging {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%236c757d' stroke='%231a1a1e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 11.5a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2'/%3E%3Cpath d='M14 10a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2'/%3E%3Cpath d='M10 10a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2'/%3E%3Cpath d='M18 11.5v2.5a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6v-1.5a2 2 0 0 1 2-2v0'/%3E%3C/svg%3E") 12 12, grabbing !important;
+}
+
+/* DARK MODE ONLY: Standard native hand cursor */
+html.dark .react-flow__pane {
+    cursor: grab !important;
+}
+
+html.dark .react-flow__pane:active,
+html.dark .react-flow__pane.dragging {
+    cursor: grabbing !important;
+}
+
+.react-flow__node {
+    cursor: pointer !important;
+}
+
+.react-flow__node:active,
+.react-flow__node.dragging {
+    cursor: grabbing !important;
+}
+
+.react-flow__edge,
+.react-flow__edge-path {
+    cursor: pointer !important;
 }

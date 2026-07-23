@@ -246,5 +246,17 @@
 - [x] Updated edge storage patch to persist `labelOffsetPct` alongside label in edge data
 - [x] Verified full type-safety with zero TypeScript errors (`tsc --noEmit` exit code 0)
 
+### Phase 34: Light/Dark Theme Toggle
+- [x] Created `components/theme-provider.tsx` client-side theme context and hook to manage and persist theme choice in `localStorage`.
+- [x] Integrated `ThemeProvider` in `app/layout.tsx`, removed hardcoded `"dark"` class, and added head inline script for FOUC prevention.
+- [x] Updated `app/globals.css` with a premium light theme design token variable set in `:root` and moved dark values to `.dark`.
+- [x] Placed Sun/Moon toggle button in `components/editor/editor-navbar.tsx` right-side buttons.
+- [x] Refactored `components/editor/custom-node.tsx` to dynamically resolve node backgrounds/text using theme-aware colors, adaptive selection outlines, and handle colors.
+- [x] Updated custom connection handles to display high-contrast styling (`!bg-[var(--text-primary)] !border-[var(--bg-base)]`) in both modes.
+- [x] Refactored `components/editor/custom-edge.tsx` to use theme variables (`var(--text-primary)`, `var(--text-faint)`) for active/inactive strokes.
+- [x] Linked React Flow's `colorMode` directly to active theme, corrected wrapper background, and bound grid dots color in `components/editor/collaborative-canvas.tsx`.
+- [x] Refactored `components/editor/starter-templates-modal.tsx` to use theme variables for modal dialogs and template previews.
+- [x] Verified full type-safety and successful clean Next.js build compilation.
+
 ## Next Steps
 - [ ] Continue with the next phase of system enhancements.

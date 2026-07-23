@@ -7,6 +7,7 @@ import {
   useReactFlow,
   type EdgeProps,
 } from "@xyflow/react"
+import { useTheme } from "@/components/theme-provider"
 
 export function CustomEdge({
   id,
@@ -22,17 +23,13 @@ export function CustomEdge({
   label,
 }: EdgeProps) {
   const { setEdges } = useReactFlow()
+  const { theme } = useTheme()
+  const isLight = theme === "light"
+
   const [isHovered, setIsHovered] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [localValue, setLocalValue] = useState((label as string) || (data as any)?.label || "")
   const inputRef = useRef<HTMLInputElement>(null)
-
-  // Keep local value in sync with incoming data updates
-  useEffect(() => {
-    if (!isEditing) {
-      setLocalValue((label as string) || (data as any)?.label || "")
-    }
-  }, [label, data, isEditing])
 
   // Auto focus and select input text when editing begins
   useEffect(() => {
@@ -42,111 +39,90 @@ export function CustomEdge({
     }
   }, [isEditing])
 
-  // Get orthogonal path and default label position from React Flow's getSmoothStepPath
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition,
-    targetPosition,
-    borderRadius: 8,
-  })
-
-  // Highlight state: active when hovered or selected
-  const isActive = !!selected || isHovered
-
-  // Styling properties
-  const strokeColor = isActive ? "#f8fafc" : "#505060"
-  const strokeWidth = isActive ? 1.5 : 1
-
   const handleDoubleClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     setIsEditing(true)
   }, [])
 
-  const handleSave = useCallback(() => {
-    setIsEditing(false)
-    const trimmedVal = localValue.trim()
-    setEdges((eds) =>
-      eds.map((edge) => {
-        if (edge.id === id) {
-          return {
-            ...edge,
-            label: trimmedVal,
-            data: {
-              ...edge.data,
-              label: trimmedVal,
-            },
-          }
-        }
-        return edge
-      })
-    )
-  }, [id, localValue, setEdges])
-
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
         e.preventDefault()
-        handleSave()
-      } else if (e.key === "Escape") {
-        e.preventDefault()
-        // Reset to original value and exit
-        setLocalValue((label as string) || (data as any)?.label || "")
         setIsEditing(false)
+        setEdges((edges) =>
+          edges.map((edge) =>
+            edge.id === id
+              ? {
+                  ...edge,
+                  label: localValue,
+                  data: { ...edge.data, label: localValue },
+                }
+              : edge
+          )
+        )
+      } else if (e.key === "Escape") {
+        setIsEditing(false)
+        setLocalValue((label as string) || (data as any)?.label || "")
       }
     },
-    [label, data, handleSave]
+    [id, localValue, label, data, setEdges]
   )
 
   const handleBlur = useCallback(() => {
-    handleSave()
-  }, [handleSave])
+    setIsEditing(false)
+    setEdges((edges) =>
+      edges.map((edge) =>
+        edge.id === id
+          ? {
+              ...edge,
+              label: localValue,
+              data: { ...edge.data, label: localValue },
+            }
+          : edge
+      )
+    )
+  }, [id, localValue, setEdges])
 
-  const labelText = (label as string) || (data as any)?.label || ""
+  // 1. Calculate path and midpoint
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+    borderRadius: 16,
+  })
+
+  // 2. Active highlight state
+  const isActive = !!selected || isHovered
+  const labelText = (label as string) || (data as any)?.label
 
   return (
     <>
-      {/* SVG definitions for dynamic Arrowhead Marker */}
-      <defs>
-        <marker
-          id={`arrow-${id}`}
-          viewBox="0 0 10 10"
-          refX="6"
-          refY="5"
-          markerWidth="6"
-          markerHeight="6"
-          orient="auto-start-reverse"
-        >
-          <path
-            d="M 0 1.5 L 10 5 L 0 8.5 Z"
-            fill={strokeColor}
-            className="transition-colors duration-150"
-          />
-        </marker>
-      </defs>
-
-      {/* Invisible wider interaction path for easy clicking/hovering */}
+      {/* Invisible wider hit region for easier mouse hover/clicks */}
       <path
         d={edgePath}
         fill="none"
         stroke="transparent"
-        strokeWidth={15}
+        strokeWidth={20}
         className="cursor-pointer pointer-events-auto"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onDoubleClick={handleDoubleClick}
       />
 
-      {/* Visible thin right-angle path */}
+      {/* Visible edge line with smooth transition */}
       <path
         id={id}
         d={edgePath}
         fill="none"
-        stroke={strokeColor}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
+        stroke={
+          isActive
+            ? "var(--text-primary)"
+            : "var(--text-faint)"
+        }
+        strokeWidth={isActive ? 2 : 1.25}
+        strokeDasharray={isActive ? "none" : "5 5"}
         markerEnd={`url(#arrow-${id})`}
         style={style}
         className="transition-[stroke,stroke-width] duration-150 pointer-events-none"
@@ -166,9 +142,13 @@ export function CustomEdge({
           onClick={(e) => e.stopPropagation()}
         >
           {isEditing ? (
-            <div className="relative inline-flex items-center min-w-[60px] max-w-[200px] h-6 bg-bg-subtle border border-accent-primary rounded-md px-2 py-0.5 shadow-lg shadow-background/50">
+            <div
+              className={`relative inline-flex items-center min-w-[70px] max-w-[220px] h-7 border-2 border-accent-primary rounded-md px-2.5 py-0.5 shadow-lg ${
+                isLight ? "bg-slate-900 text-white" : "bg-slate-800 text-slate-100"
+              }`}
+            >
               {/* Hidden text helper to automatically resize input container */}
-              <span className="invisible whitespace-pre text-[7.8px] font-bold px-1">
+              <span className="invisible whitespace-pre text-[11px] font-extrabold px-1">
                 {localValue || "Add label"}
               </span>
               <input
@@ -178,13 +158,18 @@ export function CustomEdge({
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 placeholder="Add label"
-                className="absolute inset-0 w-full h-full bg-transparent text-text-primary text-[7.8px] font-bold text-center border-none outline-none focus:ring-0 focus:outline-none"
+                className="absolute inset-0 w-full h-full bg-transparent text-[11px] font-extrabold text-center border-none outline-none focus:ring-0 focus:outline-none"
+                style={{ color: "inherit" }}
               />
             </div>
           ) : labelText ? (
             <div
               onDoubleClick={handleDoubleClick}
-              className="bg-bg-elevated/90 border border-border-default hover:border-border-subtle hover:bg-bg-subtle/95 hover:text-text-primary text-text-secondary text-[7.8px] font-bold tracking-wide px-2.5 py-0.5 rounded-full shadow-md backdrop-blur-sm cursor-pointer transition-all duration-150"
+              className={`border-1.5 text-[11px] font-extrabold tracking-wide px-3 py-0.5 rounded-full shadow-md backdrop-blur-sm cursor-pointer transition-all duration-150 hover:scale-105 ${
+                isLight
+                  ? "bg-slate-900 text-white border-slate-950 hover:bg-slate-800"
+                  : "bg-slate-800 text-slate-100 border-slate-700 hover:bg-slate-700"
+              }`}
             >
               {labelText}
             </div>
@@ -192,7 +177,11 @@ export function CustomEdge({
             isActive && (
               <div
                 onClick={handleDoubleClick}
-                className="bg-bg-base/60 border border-dashed border-border-subtle hover:border-accent-primary hover:text-text-primary text-text-muted text-[7.8px] font-light italic px-2.5 py-0.5 rounded-full cursor-pointer transition-all duration-150 animate-in fade-in duration-200"
+                className={`border border-dashed text-[11px] font-medium italic px-2.5 py-0.5 rounded-full cursor-pointer transition-all duration-150 animate-in fade-in duration-200 ${
+                  isLight
+                    ? "bg-slate-900/90 text-slate-200 border-slate-700 hover:border-accent-primary hover:text-white"
+                    : "bg-slate-800/90 text-slate-400 border-slate-700 hover:border-accent-primary hover:text-slate-100"
+                }`}
               >
                 Add label
               </div>

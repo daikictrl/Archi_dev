@@ -10,6 +10,19 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { CANVAS_TEMPLATES, type CanvasTemplate } from "./starter-templates"
+import { useTheme } from "@/components/theme-provider"
+
+// Light mode color overrides (ultra-high contrast 300-level fills, bold 2.5px borders, pure black text)
+const LIGHT_NODE_COLORS = {
+  "#1f1f1f": { fill: "#ced4da", text: "#000000", border: "#343a40" }, // Neutral
+  "#10233d": { fill: "#93c5fd", text: "#000000", border: "#1d4ed8" }, // Blue
+  "#2e1938": { fill: "#d8b4fe", text: "#000000", border: "#6b21a8" }, // Purple
+  "#331b00": { fill: "#fdba74", text: "#000000", border: "#c2410c" }, // Orange
+  "#3c1618": { fill: "#fca5a5", text: "#000000", border: "#b91c1c" }, // Red
+  "#3a1726": { fill: "#f9a8d4", text: "#000000", border: "#be185d" }, // Pink
+  "#0f2e18": { fill: "#86efac", text: "#000000", border: "#15803d" }, // Green
+  "#062822": { fill: "#5eead4", text: "#000000", border: "#0f766e" }, // Teal
+}
 
 interface TemplatePreviewProps {
   template: CanvasTemplate
@@ -17,6 +30,8 @@ interface TemplatePreviewProps {
 
 export function TemplatePreview({ template }: TemplatePreviewProps) {
   const { nodes, edges } = template
+  const { theme } = useTheme()
+  const isLight = theme === "light"
 
   if (!nodes || nodes.length === 0) return null
 
@@ -67,7 +82,7 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
       width="100%"
       height="100%"
       viewBox={`0 0 ${viewWidth} ${viewHeight}`}
-      className="bg-zinc-950/60 border border-border/40 rounded-lg overflow-hidden select-none"
+      className="bg-bg-base border border-border-default/40 rounded-lg overflow-hidden select-none"
     >
       {/* 4. Render Edges */}
       {edges.map((edge) => {
@@ -88,7 +103,7 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
             y1={sy}
             x2={tx}
             y2={ty}
-            stroke="rgba(255, 255, 255, 0.18)"
+            stroke={isLight ? "rgba(0, 0, 0, 0.15)" : "rgba(255, 255, 255, 0.18)"}
             strokeWidth={1.5}
             strokeDasharray={edge.label ? "3 2" : undefined}
           />
@@ -104,25 +119,43 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
         const color = node.data.color || "#1F1F1F"
         const shape = node.data.shape || "rectangle"
 
-        let textColor = "#EDEDED"
-        if (color === "#10233D") textColor = "#52A8FF"
-        else if (color === "#2E1938") textColor = "#BF7AF0"
-        else if (color === "#331B00") textColor = "#FF990A"
-        else if (color === "#3C1618") textColor = "#FF6166"
-        else if (color === "#3A1726") textColor = "#F75F8F"
-        else if (color === "#0F2E18") textColor = "#62C073"
-        else if (color === "#062822") textColor = "#0AC7B4"
+        let resolvedFill = color
+        let resolvedText = "#EDEDED"
+        let resolvedBorder = isLight ? "rgba(0, 0, 0, 0.15)" : "rgba(255, 255, 255, 0.15)"
+
+        if (isLight) {
+          const lightColor = LIGHT_NODE_COLORS[color.toLowerCase() as keyof typeof LIGHT_NODE_COLORS]
+          if (lightColor) {
+            resolvedFill = lightColor.fill
+            resolvedText = lightColor.text
+            resolvedBorder = lightColor.border
+          } else {
+            resolvedFill = "#ffffff"
+            resolvedText = "#18181b"
+            resolvedBorder = "#8a8a93"
+          }
+        } else {
+          if (color === "#10233D") resolvedText = "#52A8FF"
+          else if (color === "#2E1938") resolvedText = "#BF7AF0"
+          else if (color === "#331B00") resolvedText = "#FF990A"
+          else if (color === "#3C1618") resolvedText = "#FF6166"
+          else if (color === "#3A1726") resolvedText = "#F75F8F"
+          else if (color === "#0F2E18") resolvedText = "#62C073"
+          else if (color === "#062822") resolvedText = "#0AC7B4"
+        }
 
         let shapeElement = null
+        const strokeColor = resolvedBorder
+        const strokeWidth = isLight ? 1.5 : 1
 
         if (shape === "diamond") {
           const points = `${x + w / 2},${y} ${x + w},${y + h / 2} ${x + w / 2},${y + h} ${x},${y + h / 2}`
           shapeElement = (
             <polygon
               points={points}
-              fill={color}
-              stroke="rgba(255, 255, 255, 0.15)"
-              strokeWidth={1}
+              fill={resolvedFill}
+              stroke={strokeColor}
+              strokeWidth={strokeWidth}
             />
           )
         } else if (shape === "hexagon") {
@@ -130,9 +163,9 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
           shapeElement = (
             <polygon
               points={points}
-              fill={color}
-              stroke="rgba(255, 255, 255, 0.15)"
-              strokeWidth={1}
+              fill={resolvedFill}
+              stroke={strokeColor}
+              strokeWidth={strokeWidth}
             />
           )
         } else if (shape === "cylinder") {
@@ -141,18 +174,18 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
             <g>
               <path
                 d={`M ${x},${y + topLidH} L ${x},${y + h - topLidH} A ${w * 0.5},${topLidH} 0 0,0 ${x + w},${y + h - topLidH} L ${x + w},${y + topLidH} Z`}
-                fill={color}
-                stroke="rgba(255, 255, 255, 0.15)"
-                strokeWidth={1}
+                fill={resolvedFill}
+                stroke={strokeColor}
+                strokeWidth={strokeWidth}
               />
               <ellipse
                 cx={x + w / 2}
                 cy={y + topLidH}
                 rx={w / 2}
                 ry={topLidH}
-                fill={color}
-                stroke="rgba(255, 255, 255, 0.15)"
-                strokeWidth={1}
+                fill={resolvedFill}
+                stroke={strokeColor}
+                strokeWidth={strokeWidth}
               />
             </g>
           )
@@ -165,9 +198,9 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
               height={h}
               rx={h / 2}
               ry={h / 2}
-              fill={color}
-              stroke="rgba(255, 255, 255, 0.15)"
-              strokeWidth={1}
+              fill={resolvedFill}
+              stroke={strokeColor}
+              strokeWidth={strokeWidth}
             />
           )
         } else if (shape === "circle") {
@@ -177,9 +210,9 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
               cy={y + h / 2}
               rx={w / 2}
               ry={h / 2}
-              fill={color}
-              stroke="rgba(255, 255, 255, 0.15)"
-              strokeWidth={1}
+              fill={resolvedFill}
+              stroke={strokeColor}
+              strokeWidth={strokeWidth}
             />
           )
         } else {
@@ -192,30 +225,26 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
               height={h}
               rx={6}
               ry={6}
-              fill={color}
-              stroke="rgba(255, 255, 255, 0.15)"
-              strokeWidth={1}
+              fill={resolvedFill}
+              stroke={strokeColor}
+              strokeWidth={strokeWidth}
             />
           )
         }
-
-        const label = node.data.label || ""
-        const displayLabel = label.length > 15 ? label.substring(0, 13) + "..." : label
-        const fontSize = Math.max(5, Math.min(8, 10.5 * scale))
 
         return (
           <g key={node.id}>
             {shapeElement}
             <text
               x={x + w / 2}
-              y={y + h / 2 + (shape === "cylinder" ? fontSize * 0.45 : fontSize * 0.35)}
+              y={y + h / 2}
+              fill={resolvedText}
+              fontSize={Math.max(4.5, 6 * scale)}
+              fontWeight="bold"
               textAnchor="middle"
-              fill={textColor}
-              fontSize={fontSize}
-              fontWeight="600"
-              className="pointer-events-none select-none tracking-tight font-sans opacity-95"
+              dominantBaseline="central"
             >
-              {displayLabel}
+              {node.data.label ? (node.data.label.length > 10 ? `${node.data.label.slice(0, 8)}..` : node.data.label) : "Node"}
             </text>
           </g>
         )
@@ -237,12 +266,12 @@ export function StarterTemplatesModal({
 }: StarterTemplatesModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-4xl p-6 bg-zinc-900 border border-zinc-800 rounded-2xl text-zinc-100 shadow-2xl flex flex-col max-h-[90vh]">
+      <DialogContent className="sm:max-w-4xl p-6 bg-bg-surface border border-border-default rounded-2xl text-text-primary shadow-2xl flex flex-col max-h-[90vh]">
         <DialogHeader className="gap-1 mb-4 shrink-0">
-          <DialogTitle className="text-xl font-semibold tracking-tight text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-semibold tracking-tight text-text-primary flex items-center gap-2">
             Starter Templates
           </DialogTitle>
-          <DialogDescription className="text-sm text-zinc-400">
+          <DialogDescription className="text-sm text-text-secondary">
             Kickstart your canvas design with one of our pre-built architectures. Selecting a template will overwrite your current canvas.
           </DialogDescription>
         </DialogHeader>
@@ -252,23 +281,24 @@ export function StarterTemplatesModal({
             {CANVAS_TEMPLATES.map((template) => (
               <div
                 key={template.id}
-                className="group flex flex-col justify-between rounded-xl bg-zinc-950/40 border border-zinc-800/80 hover:border-zinc-700/60 p-4 transition-all duration-300 hover:shadow-xl hover:shadow-black/20"
+                className="group flex flex-col justify-between rounded-xl bg-bg-base/40 border border-border-default hover:border-border-subtle p-4 transition-all duration-300 hover:shadow-xl hover:shadow-black/5"
               >
                 <div>
-                  <div className="aspect-[28/15] w-full mb-4 bg-zinc-950/20 rounded-lg overflow-hidden border border-zinc-900 shadow-inner group-hover:border-zinc-800/60 transition-colors duration-300">
+                  <div className="aspect-[28/15] w-full mb-4 bg-bg-base rounded-lg overflow-hidden border border-border-default shadow-inner group-hover:border-border-subtle transition-colors duration-300">
                     <TemplatePreview template={template} />
                   </div>
-                  <h3 className="text-sm font-semibold text-zinc-100 mb-1 group-hover:text-white transition-colors duration-200">
+                  <h3 className="text-sm font-semibold text-text-primary mb-1 group-hover:text-accent-primary transition-colors duration-200">
                     {template.name}
                   </h3>
-                  <p className="text-xs text-zinc-400 leading-normal mb-6 min-h-[48px]">
+                  <p className="text-xs text-text-secondary leading-normal mb-6 min-h-[48px]">
                     {template.description}
                   </p>
                 </div>
                 
                 <Button
                   onClick={() => onImport(template)}
-                  className="w-full text-xs font-semibold py-2 bg-zinc-800 hover:bg-white text-zinc-200 hover:text-zinc-950 border border-zinc-700 hover:border-white transition-all duration-200 rounded-lg shadow-sm"
+                  variant="secondary"
+                  className="w-full text-xs font-semibold py-2 transition-all duration-200 rounded-lg shadow-sm"
                 >
                   Import Template
                 </Button>

@@ -1,9 +1,9 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { useReactFlow, useViewport } from "@xyflow/react"
+import { useReactFlow, useViewport, getNodesBounds, getViewportForBounds } from "@xyflow/react"
 import { useHistory } from "@liveblocks/react/suspense"
-import { ZoomIn, ZoomOut, Maximize, Undo2, Redo2 } from "lucide-react"
+import { ZoomIn, ZoomOut, Maximize, Undo2, Redo2, Download } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const PRESETS = [
@@ -16,7 +16,7 @@ const PRESETS = [
 ]
 
 export function ControlBar() {
-  const { zoomIn, zoomOut, fitView, zoomTo } = useReactFlow()
+  const { zoomIn, zoomOut, fitView, zoomTo, getNodes } = useReactFlow()
   const { zoom } = useViewport()
   const history = useHistory()
   const undo = () => history.undo()
@@ -164,6 +164,60 @@ export function ControlBar() {
           aria-label="Zoom In"
         >
           <ZoomIn className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Divider */}
+      <div className="h-4 w-px bg-border-default mx-1.5" />
+
+      {/* Export Control */}
+      <div className="flex items-center gap-0.5">
+        <button
+          onClick={() => {
+            const nodes = getNodes()
+            if (!nodes.length) return
+
+            // Output image resolution
+            const IMG_W = 2400
+            const IMG_H = 1600
+            const PADDING = 80
+
+            // Compute bounding box of ALL nodes (even off-screen)
+            const bounds = getNodesBounds(nodes)
+
+            // Calculate the viewport transform that fits ALL nodes into our target image
+            const viewport = getViewportForBounds(bounds, IMG_W, IMG_H, 0.1, 4, PADDING)
+
+            // Target the internal React Flow viewport layer — NOT the outer wrapper
+            const viewportEl = document.querySelector(".react-flow__viewport") as HTMLElement
+            if (!viewportEl) return
+
+            import("html-to-image").then(({ toPng }) => {
+              toPng(viewportEl, {
+                backgroundColor: "#0A0A0A",
+                width: IMG_W,
+                height: IMG_H,
+                pixelRatio: 2, // 2x for crisp, high-res output
+                style: {
+                  // Apply the computed transform so ALL nodes are captured
+                  width: `${IMG_W}px`,
+                  height: `${IMG_H}px`,
+                  transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+                  transformOrigin: "top left",
+                },
+              }).then((dataUrl) => {
+                const a = document.createElement("a")
+                a.setAttribute("download", "architecture.png")
+                a.setAttribute("href", dataUrl)
+                a.click()
+              })
+            })
+          }}
+          className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-elevated rounded-full transition-all duration-200 cursor-pointer"
+          title="Download as PNG"
+          aria-label="Download"
+        >
+          <Download className="h-4 w-4" />
         </button>
       </div>
 

@@ -22,15 +22,15 @@ const NodeMutationSchema = z.object({
     })
     .optional()
     .describe("X and Y coordinates on the canvas."),
-  label: z.string().optional().describe("Display text label of the node."),
+  label: z.string().optional().describe("Display text label of the node. REQUIRED for new nodes. Do NOT use generic names like 'New Node'."),
   shape: z
     .enum(NODE_SHAPES)
     .optional()
-    .describe("Shape of the node."),
+    .describe("Shape of the node. REQUIRED for new nodes. Choose semantically."),
   color: z
     .string()
     .optional()
-    .describe("Hex fill color of the node. Must be one of: #1F1F1F, #10233D, #2E1938, #331B00, #3C1618, #3A1726, #0F2E18, #062822"),
+    .describe("Hex fill color of the node. REQUIRED for new nodes. Group related services by color. Must be one of: #1F1F1F, #10233D, #2E1938, #331B00, #3C1618, #3A1726, #0F2E18, #062822"),
   width: z.number().optional().describe("Width of the node. Must follow the standard size for the chosen shape (e.g., rectangle: 180, diamond: 110, circle: 90, pill: 140, cylinder: 110, hexagon: 130)."),
   height: z.number().optional().describe("Height of the node. Must follow the standard size for the chosen shape (e.g., rectangle: 80, diamond: 110, circle: 90, pill: 60, cylinder: 110, hexagon: 110)."),
 });
@@ -247,13 +247,28 @@ Allowed Colors (Hex values ONLY):
 - Teal: "#062822"
 
 ═══════════════════════════════════════
+  SHAPE & COLOR SEMANTICS (MUST FOLLOW)
+═══════════════════════════════════════
+
+Use shapes meaningfully to represent the type of component:
+- "rectangle": Standard services, APIs, web clients, frontend apps.
+- "cylinder": Databases, caches, file storage (SQL, NoSQL, Redis, S3).
+- "diamond": Message brokers, event buses, logic gates, load balancers, WebSockets.
+- "hexagon": External 3rd party services, webhooks, outside world.
+- "pill": Queues, data streams, background workers.
+- "circle": Users, clients, simple nodes.
+
+Use colors to group related services (e.g. all auth services in Purple, all storage in Green, etc).
+When adding ANY new node, you MUST provide a descriptive label, shape, and color. NEVER leave them blank or use generic names like "New Node".
+
+═══════════════════════════════════════
   CRITICAL LABEL RULES (MUST FOLLOW)
 ═══════════════════════════════════════
 
 1. NODE LABELS = Component / service names ONLY. Short (1-3 words).
    ✓ Good: "Auth Service", "API Gateway", "User DB", "Cache"
-   ✗ Bad:  "HTTPS/Login", "Writes/Reads Data", "REST API Call"
-   A node label should NEVER contain a protocol, verb, or action.
+   ✗ Bad:  "New Node", "HTTPS/Login", "Writes/Reads Data", "REST API Call"
+   A node label should NEVER contain a protocol, verb, action, or the word "New Node".
 
 2. EDGE LABELS = Protocol or relationship ONLY. Max 1-3 words.
    ✓ Good: "REST", "gRPC", "Pub/Sub", "Reads", "Writes", "WebSocket", "HTTPS"

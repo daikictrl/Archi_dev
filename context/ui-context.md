@@ -2,29 +2,30 @@
 
 ## Theme
 
-Dark only. No light mode. The visual language is a dark technical workspace — near-black backgrounds, layered surfaces, and vivid accent colors for interactive elements.
+Supports both light and dark modes with a toggle located in the main navigation bar. The default is dark mode to preserve the core technical workspace aesthetic.
 
-All colors are defined as CSS custom properties in `globals.css` and mapped to Tailwind tokens via `@theme inline`. Components must use these tokens — no hardcoded hex values or raw Tailwind color classes like `zinc-*`.
+All colors are defined as CSS custom properties in `globals.css` and mapped to Tailwind tokens via `@theme inline`. Components must use these tokens—no hardcoded hex values or raw Tailwind color classes like `zinc-*`.
 
-| Role             | CSS Variable           | Hex / Value               |
-| ---------------- | ---------------------- | ------------------------- |
-| Page background  | `--bg-base`            | `#080809`                 |
-| Surface          | `--bg-surface`         | `#111114`                 |
-| Elevated surface | `--bg-elevated`        | `#18181c`                 |
-| Subtle surface   | `--bg-subtle`          | `#1e1e23`                 |
-| Default border   | `--border-default`     | `#2a2a30`                 |
-| Subtle border    | `--border-subtle`      | `#3a3a42`                 |
-| Primary text     | `--text-primary`       | `#f0f0f4`                 |
-| Secondary text   | `--text-secondary`     | `#c0c0cc`                 |
-| Muted text       | `--text-muted`         | `#808090`                 |
-| Faint text       | `--text-faint`         | `#505060`                 |
-| Brand accent     | `--accent-primary`     | `#00c8d4` (cyan)          |
-| Brand dim        | `--accent-primary-dim` | `rgba(0, 200, 212, 0.12)` |
-| AI accent        | `--accent-ai`          | `#6457f9` (indigo-purple) |
-| AI text          | `--accent-ai-text`     | `#8b82ff`                 |
-| Error            | `--state-error`        | `#ff4d4f`                 |
-| Success          | `--state-success`      | `#34d399`                 |
-| Warning          | `--state-warning`      | `#fbbf24`                 |
+| Role             | CSS Variable           | Dark Mode Value           | Light Mode Value          |
+| ---------------- | ---------------------- | ------------------------- | ------------------------- |
+| Page background  | `--bg-base`            | `#080809`                 | `#f8f9fa`                 |
+| Surface          | `--bg-surface`         | `#111114`                 | `#ffffff`                 |
+| Elevated surface | `--bg-elevated`        | `#18181c`                 | `#f1f3f5`                 |
+| Subtle surface   | `--bg-subtle`          | `#1e1e23`                 | `#e9ecef`                 |
+| Default border   | `--border-default`     | `#2a2a30`                 | `#dee2e6`                 |
+| Subtle border    | `--border-subtle`      | `#3a3a42`                 | `#ced4da`                 |
+| Primary text     | `--text-primary`       | `#f0f0f4`                 | `#1a1a1e`                 |
+| Secondary text   | `--text-secondary`     | `#c0c0cc`                 | `#495057`                 |
+| Muted text       | `--text-muted`         | `#808090`                 | `#6c757d`                 |
+| Faint text       | `--text-faint`         | `#505060`                 | `#adb5bd`                 |
+| Brand accent     | `--accent-primary`     | `#00c8d4` (cyan)          | `#008f9a`                 |
+| Brand dim        | `--accent-primary-dim` | `rgba(0, 200, 212, 0.12)` | `rgba(0, 143, 154, 0.1)`  |
+| AI accent        | `--accent-ai`          | `#6457f9` (indigo-purple) | `#4f46e5`                 |
+| AI text          | `--accent-ai-text`     | `#8b82ff`                 | `#6366f1`                 |
+| Error            | `--state-error`        | `#ff4d4f`                 | `#dc3545`                 |
+| Success          | `--state-success`      | `#34d399`                 | `#198754`                 |
+| Warning          | `--state-warning`      | `#fbbf24`                 | `#f5a623`                 |
+| Selection outline| `--selection-outline`  | `#ffffff`                 | `#1a1a1e`                 |
 
 Tailwind utility names map to these variables. Use `bg-base`, `bg-surface`, `text-copy-primary`, `text-copy-muted`, `border-surface-border`, `text-brand`, `bg-accent-dim`, etc.
 

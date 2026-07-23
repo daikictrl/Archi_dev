@@ -19,6 +19,7 @@ import { Trash2 } from "lucide-react"
 import type { CanvasNode, CanvasEdge } from "@/types/canvas"
 import { CustomNode } from "./custom-node"
 import { CustomEdge } from "./custom-edge"
+import { useTheme } from "@/components/theme-provider"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 import { ControlBar } from "./control-bar"
 import { useCanvasAutosave } from "@/hooks/use-canvas-autosave"
@@ -447,13 +448,14 @@ function CollaborativeCanvasInner({
     },
     [screenToFlowPosition, onNodesChange]
   )
+  const { theme } = useTheme()
 
   return (
     <div
       ref={reactFlowWrapper}
       onDragOver={onDragOver}
       onDrop={onDrop}
-      className="h-full w-full bg-zinc-950/40 relative"
+      className="h-full w-full bg-background relative"
     >
       <ReactFlow
         nodes={nodes}
@@ -468,8 +470,8 @@ function CollaborativeCanvasInner({
           type: "customEdge",
         }}
         connectionMode={ConnectionMode.Loose}
-        colorMode="dark"
-        className="text-zinc-100"
+        colorMode={theme}
+        className="text-text-primary"
         onNodeContextMenu={onNodeContextMenu}
         onSelectionContextMenu={onSelectionContextMenu}
         onPaneClick={() => setContextMenu(null)}
@@ -477,7 +479,7 @@ function CollaborativeCanvasInner({
         onPointerLeave={onPointerLeave}
         deleteKeyCode={null}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!text-zinc-800" />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!text-[var(--border-subtle)]" />
         <ControlBar />
         <Cursors components={{ Cursor: CustomCursor }} />
         <CanvasAutosaveComponent projectId={projectId} nodes={nodes} edges={edges} />
